@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Valentine Special</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Space+Grotesk:wght@300;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --ink: #1b0f13;
+        --soft-ink: #3f242b;
+        --cream: #fff6f3;
+        --blush: #ffd4d8;
+        --rose: #f56a7b;
+        --berry: #7b1e36;
+        --gold: #f7c97b;
+        --shadow: rgba(43, 12, 20, 0.18);
+        --hand-my: none;
+        --hand-your: none;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Space Grotesk", "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: radial-gradient(circle at top, #fff9f7 10%, #ffe5e9 45%, #ffd2d7 80%);
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      .veil {
+        position: fixed;
+        inset: 0;
+        background: linear-gradient(140deg, rgba(255, 232, 236, 0.96), rgba(255, 245, 240, 0.9));
+        backdrop-filter: blur(6px);
+        z-index: 10;
+        display: grid;
+        place-items: center;
+        padding: 32px;
+        transition: opacity 0.8s ease, visibility 0.8s ease;
+      }
+
+      .veil.hidden {
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      .unlock-card {
+        max-width: 920px;
+        width: min(920px, 92vw);
+        background: #fff;
+        border-radius: 28px;
+        padding: 32px;
+        box-shadow: 0 40px 80px var(--shadow);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .unlock-card::after {
+        content: "";
+        position: absolute;
+        top: -120px;
+        right: -120px;
+        width: 280px;
+        height: 280px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(245, 106, 123, 0.25), rgba(245, 106, 123, 0));
+      }
+
+      .unlock-headline {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 16px;
+      }
+
+      .unlock-headline h1 {
+        margin: 0;
+        font-family: "Cormorant Garamond", serif;
+        font-size: clamp(2rem, 3.2vw, 3.2rem);
+        letter-spacing: 0.5px;
+      }
+
+      .unlock-headline p {
+        margin: 0;
+        color: var(--soft-ink);
+        font-size: 1rem;
+      }
+
+      .puzzle-wrap {
+        margin-top: 24px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 24px;
+        align-items: center;
+      }
+
+      .puzzle-area {
+        position: relative;
+        background: linear-gradient(145deg, #ffe9ec, #fff7f5);
+        border-radius: 24px;
+        padding: 24px;
+        min-height: 220px;
+        border: 2px dashed rgba(123, 30, 54, 0.2);
+        overflow: hidden;
+      }
+
+      .hand-silhouette,
+      .hand-drag {
+        width: 180px;
+        height: 180px;
+        border-radius: 32% 32% 45% 45%;
+        background-image: var(--hand-my),
+          radial-gradient(circle at 30% 30%, #ffd9c9, #f4bfae 60%, #d39786);
+        background-size: cover;
+        background-position: center;
+        position: absolute;
+        display: grid;
+        place-items: center;
+        font-weight: 600;
+        color: rgba(27, 15, 19, 0.6);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-size: 0.7rem;
+      }
+
+      .hand-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 32% 32% 45% 45%;
+        display: block;
+      }
+
+      .hand-silhouette {
+        left: 20px;
+        top: 20px;
+        filter: grayscale(0.2) brightness(0.97);
+        opacity: 0.65;
+        transform: rotate(-8deg);
+      }
+
+      .hand-drag {
+        right: 20px;
+        bottom: 20px;
+        cursor: grab;
+        box-shadow: 0 18px 40px rgba(123, 30, 54, 0.25);
+        transition: box-shadow 0.2s ease;
+        background-image: var(--hand-your),
+          radial-gradient(circle at 30% 30%, #ffd9c9, #f4bfae 60%, #d39786);
+        background-size: cover;
+        background-position: center;
+      }
+
+      .hand-drag.dragging {
+        cursor: grabbing;
+        box-shadow: 0 22px 50px rgba(123, 30, 54, 0.35);
+      }
+
+      .puzzle-instructions {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .puzzle-instructions h2 {
+        margin: 0;
+        font-family: "Cormorant Garamond", serif;
+        font-size: 1.8rem;
+      }
+
+      .puzzle-instructions p {
+        margin: 0;
+        color: var(--soft-ink);
+        line-height: 1.6;
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: rgba(245, 106, 123, 0.12);
+        color: var(--berry);
+        border-radius: 999px;
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+
+      .status-pill.ready {
+        background: rgba(247, 201, 123, 0.25);
+        color: #6b3b05;
+      }
+
+      main {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.8s ease, transform 0.8s ease;
+      }
+
+      main.unlocked {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .hero {
+        padding: 72px 8vw 36px;
+        display: grid;
+        gap: 24px;
+        position: relative;
+      }
+
+      .hero h1 {
+        font-family: "Cormorant Garamond", serif;
+        font-size: clamp(2.4rem, 4vw, 4rem);
+        margin: 0;
+      }
+
+      .hero p {
+        max-width: 640px;
+        font-size: 1.05rem;
+        color: var(--soft-ink);
+        line-height: 1.7;
+      }
+
+      .hero .signature {
+        font-weight: 600;
+        letter-spacing: 1px;
+      }
+
+      .floating-hearts {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+
+      .heart {
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        background: var(--rose);
+        transform: rotate(45deg);
+        animation: float 8s ease-in-out infinite;
+        opacity: 0.8;
+      }
+
+      .heart::before,
+      .heart::after {
+        content: "";
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: inherit;
+      }
+
+      .heart::before {
+        top: -8px;
+        left: 0;
+      }
+
+      .heart::after {
+        left: -8px;
+        top: 0;
+      }
+
+      .heart.h1 { left: 8%; top: 10%; animation-delay: 0s; }
+      .heart.h2 { left: 70%; top: 12%; animation-delay: 1.5s; background: #ff9aa9; }
+      .heart.h3 { left: 88%; top: 30%; animation-delay: 2.5s; background: #f7c97b; }
+      .heart.h4 { left: 22%; top: 55%; animation-delay: 3.5s; background: #f56a7b; }
+
+      @keyframes float {
+        0% { transform: translateY(0) rotate(45deg) scale(1); opacity: 0.7; }
+        50% { transform: translateY(-24px) rotate(45deg) scale(1.05); opacity: 1; }
+        100% { transform: translateY(0) rotate(45deg) scale(1); opacity: 0.7; }
+      }
+
+      .panel {
+        background: rgba(255, 255, 255, 0.78);
+        border-radius: 24px;
+        padding: 28px;
+        margin: 0 8vw 32px;
+        box-shadow: 0 18px 50px rgba(37, 10, 16, 0.08);
+        backdrop-filter: blur(8px);
+      }
+
+      .panel h2 {
+        margin: 0 0 12px;
+        font-family: "Cormorant Garamond", serif;
+        font-size: 2rem;
+      }
+
+      .panel p {
+        margin: 0 0 16px;
+        line-height: 1.7;
+        color: var(--soft-ink);
+      }
+
+      .message-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+      }
+
+      .note {
+        padding: 16px;
+        border-radius: 16px;
+        background: linear-gradient(120deg, #fff3f4, #ffe7eb);
+        border: 1px solid rgba(123, 30, 54, 0.08);
+      }
+
+      .note h3 {
+        margin: 0 0 8px;
+        font-size: 1.05rem;
+      }
+
+      .note p {
+        margin: 0;
+        font-size: 0.95rem;
+      }
+
+      .video-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 16px;
+      }
+
+      .photo-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 14px;
+      }
+
+      .photo-grid figure {
+        margin: 0;
+        background: #fff;
+        border-radius: 18px;
+        padding: 10px;
+        border: 1px solid rgba(123, 30, 54, 0.1);
+        box-shadow: 0 12px 30px rgba(37, 10, 16, 0.08);
+      }
+
+      .photo-grid img {
+        width: 100%;
+        height: 280px;
+        object-fit: cover;
+        border-radius: 14px;
+        display: block;
+      }
+
+      .photo-grid figcaption {
+        font-size: 0.85rem;
+        color: var(--soft-ink);
+        margin-top: 8px;
+        text-align: center;
+      }
+
+      .video-card {
+        background: #fff;
+        border-radius: 18px;
+        padding: 16px;
+        border: 1px solid rgba(123, 30, 54, 0.1);
+        display: grid;
+        gap: 12px;
+      }
+
+      .video-card video {
+        width: 100%;
+        height: 220px;
+        border-radius: 14px;
+        background: #f8e3e6;
+        object-fit: cover;
+      }
+
+      .video-card input {
+        border: 1px solid rgba(123, 30, 54, 0.2);
+        border-radius: 999px;
+        padding: 8px 12px;
+        font-family: inherit;
+      }
+
+      .video-card button {
+        border: none;
+        background: var(--berry);
+        color: #fff;
+        border-radius: 999px;
+        padding: 10px 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .video-card button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(123, 30, 54, 0.2);
+      }
+
+      footer {
+        padding: 36px 8vw 60px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        color: var(--soft-ink);
+      }
+
+      footer .final-line {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 1.4rem;
+      }
+
+      /* Extra Small Phones - 320px to 374px */
+      @media (max-width: 374px) {
+        body {
+          font-size: 14px;
+        }
+
+        .veil {
+          padding: 16px;
+        }
+
+        .unlock-card {
+          padding: 16px;
+          border-radius: 20px;
+        }
+
+        .unlock-card::after {
+          width: 200px;
+          height: 200px;
+          top: -100px;
+          right: -100px;
+        }
+
+        .unlock-headline h1 {
+          font-size: 1.6rem;
+        }
+
+        .unlock-headline p {
+          font-size: 0.85rem;
+        }
+
+        .puzzle-wrap {
+          grid-template-columns: 1fr;
+          gap: 16px;
+        }
+
+        .puzzle-area {
+          min-height: 180px;
+          padding: 16px;
+        }
+
+        .hand-silhouette,
+        .hand-drag {
+          width: 110px;
+          height: 110px;
+          font-size: 0.6rem;
+        }
+
+        .puzzle-instructions h2 {
+          font-size: 1.4rem;
+        }
+
+        .puzzle-instructions p {
+          font-size: 0.9rem;
+        }
+
+        .hero {
+          padding: 80px 6vw 24px;
+        }
+
+        .hero h1 {
+          font-size: 1.8rem;
+        }
+
+        .hero p {
+          font-size: 0.95rem;
+        }
+
+        .panel {
+          padding: 16px;
+          margin: 0 6vw 20px;
+        }
+
+        .panel h2 {
+          font-size: 1.5rem;
+        }
+
+        .panel p {
+          font-size: 0.9rem;
+        }
+
+        .message-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .video-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .photo-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .video-card input,
+        .video-card button {
+          padding: 6px 10px;
+          font-size: 0.85rem;
+        }
+
+        footer {
+          padding: 24px 6vw 40px;
+        }
+
+        footer .final-line {
+          font-size: 1.1rem;
+        }
+      }
+
+      /* Small Phones - 375px to 600px */
+      @media (min-width: 375px) and (max-width: 600px) {
+        .veil {
+          padding: 20px;
+        }
+
+        .unlock-card {
+          padding: 24px;
+          border-radius: 24px;
+        }
+
+        .unlock-headline h1 {
+          font-size: 1.8rem;
+        }
+
+        .unlock-headline p {
+          font-size: 0.9rem;
+        }
+
+        .puzzle-wrap {
+          grid-template-columns: 1fr;
+          gap: 20px;
+        }
+
+        .puzzle-area {
+          min-height: 200px;
+          padding: 18px;
+        }
+
+        .hand-silhouette,
+        .hand-drag {
+          width: 130px;
+          height: 130px;
+        }
+
+        .puzzle-instructions h2 {
+          font-size: 1.5rem;
+        }
+
+        .puzzle-instructions p {
+          font-size: 0.95rem;
+        }
+
+        .hero {
+          padding: 80px 8vw 28px;
+        }
+
+        .hero h1 {
+          font-size: 2rem;
+        }
+
+        .hero p {
+          font-size: 0.95rem;
+        }
+
+        .panel {
+          padding: 20px;
+          margin: 0 8vw 24px;
+        }
+
+        .panel h2 {
+          font-size: 1.6rem;
+        }
+
+        .video-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .photo-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .message-grid {
+          grid-template-columns: 1fr;
+        }
+
+        footer {
+          padding: 28px 8vw 48px;
+        }
+      }
+
+      /* Medium Devices / Tablets - 601px to 900px */
+      @media (min-width: 601px) and (max-width: 900px) {
+        .unlock-card {
+          padding: 28px;
+        }
+
+        .unlock-headline {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .unlock-headline h1 {
+          font-size: 2.2rem;
+        }
+
+        .puzzle-wrap {
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          gap: 20px;
+        }
+
+        .hand-silhouette,
+        .hand-drag {
+          width: 150px;
+          height: 150px;
+        }
+
+        .puzzle-instructions h2 {
+          font-size: 1.6rem;
+        }
+
+        .hero {
+          padding: 60px 8vw 28px;
+        }
+
+        .hero h1 {
+          font-size: 2.8rem;
+        }
+
+        .panel {
+          padding: 24px;
+          margin: 0 8vw 28px;
+        }
+
+        .panel h2 {
+          font-size: 1.8rem;
+        }
+
+        .video-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .photo-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .message-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        footer {
+          padding: 32px 8vw 52px;
+        }
+      }
+
+      /* Large Devices / Desktops - 901px and up */
+      @media (min-width: 901px) {
+        .unlock-card {
+          padding: 32px;
+        }
+
+        .hand-silhouette,
+        .hand-drag {
+          width: 180px;
+          height: 180px;
+        }
+
+        .puzzle-instructions h2 {
+          font-size: 1.8rem;
+        }
+
+        .video-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+
+        .photo-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+
+        .message-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+
+        footer {
+          padding: 36px 8vw 60px;
+        }
+      }
+
+      /* Landscape Orientation - Phones */
+      @media (max-height: 500px) and (orientation: landscape) {
+        .hero {
+          padding: 40px 8vw 20px;
+        }
+
+        .hero h1 {
+          font-size: 2rem;
+        }
+
+        .hero p {
+          font-size: 0.9rem;
+        }
+
+        .panel {
+          padding: 16px;
+          margin: 0 8vw 16px;
+        }
+
+        footer {
+          padding: 20px 8vw 24px;
+        }
+      }
+
+      /* Touch Device Optimizations */
+      @media (hover: none) and (pointer: coarse) {
+        .video-card button {
+          padding: 12px 16px;
+          font-size: 1rem;
+          min-height: 44px;
+        }
+
+        .video-card input {
+          padding: 10px 14px;
+          font-size: 1rem;
+          min-height: 44px;
+        }
+
+        .hand-drag {
+          cursor: pointer;
+        }
+
+        .hand-drag.dragging {
+          cursor: grabbing;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="veil" id="veil">
+      <div class="unlock-card">
+        <div class="unlock-headline">
+          <h1>Our Hands, One Heart</h1>
+          <p>Let our hands find each other, just like our hearts did.</p>
+        </div>
+        <div class="puzzle-wrap">
+          <div class="puzzle-area" id="puzzleArea">
+            <div class="hand-silhouette" id="handTarget">
+              <img src="images/h2.png" alt="My Hand" class="hand-img" />
+            </div>
+            <div class="hand-drag" id="handDrag">
+              <img src="images/h1.png" alt="Your Hand" class="hand-img" />
+            </div>
+          </div>
+          <div class="puzzle-instructions">
+            <h2>Intertwine With Me</h2>
+            <p>
+              In the softness of a touch lies all we've ever wanted to say.
+              Bring your hand close to mine—when our palms meet,
+              the walls between us fall away.
+            </p>
+            <div class="status-pill" id="statusPill">Waiting for your touch</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <main id="mainContent">
+      <section class="hero">
+        <div class="floating-hearts">
+          <span class="heart h1"></span>
+          <span class="heart h2"></span>
+          <span class="heart h3"></span>
+          <span class="heart h4"></span>
+        </div>
+        <h1>Happy Valentine Day, My Valentine</h1>
+        <p>
+          This little page is for you, for us, and for everything we shared.
+        </p>
+        <p class="signature">With love and honesty.</p>
+      </section>
+
+      <section class="panel">
+        <h2>My Message</h2>
+        <p>
+          Hey my Valentine,
+        </p>
+        <p>
+          The day I met you, I was so suspicious. I doubted you a lot. I made many mistakes.
+          I pressured you to share pictures because I didn’t know whether to believe or not.
+          Looking back, I realize how unfair that was.
+        </p>
+        <p>
+          From that day until now, we’ve had so many fights… and so many beautiful memories too.
+          Late-night talks, endless messages, silly jokes — I’ll never forget those.
+          You are the first girl with whom I created so many memories, even if they were virtual.
+        </p>
+        <p>
+          For the first 5–6 months, I always had doubts in some corner of my mind. I wasn’t fully open.
+          But once we both opened up, we truly got to know each other deeply. Not in any wrong way —
+          just understanding each other’s thoughts, fears, and emotions.
+        </p>
+        <p>
+          You stood by me in both good and bad times. I never gave you surprises or gifts, and you never expected them.
+          That’s the kind of person you are — simple, genuine, and rare. In a world full of fake people, I met someone truly real.
+        </p>
+        <p>
+          I blamed you many times. I hurt you. Sometimes you cried because of me. I teased you thinking it was funny,
+          without realizing how it affected you. For all of that, I’m truly sorry.
+        </p>
+        <p>
+          I don’t know if I was the best boyfriend. Honestly, I know I wasn’t. But I hope I gave you at least one wonderful year
+          filled with moments worth remembering.
+        </p>
+        <p>
+          There’s so much more I want to say, but not everything can be put into words. I just hope you understand.
+        </p>
+        <p>
+          You were an important part of my life, and you always will be in some way. Thank you for teaching me so much —
+          about love, about patience, about myself. In many ways, you were my therapist too.
+        </p>
+        <p>
+          I truly hope you have a beautiful, peaceful, and prosperous life ahead.
+        </p>
+        <p>
+          Thank you… my Valentine. ❤️
+        </p>
+        <div class="message-grid">
+          <div class="note">
+            <h3>Thank You</h3>
+            <p>For every late-night talk, every message, every memory.</p>
+          </div>
+          <div class="note">
+            <h3>Sorry</h3>
+            <p>For the times I hurt you without realizing.</p>
+          </div>
+          <div class="note">
+            <h3>Wish</h3>
+            <p>A beautiful, peaceful, and prosperous life ahead.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Our Videos</h2>
+        <p>
+          Add your favorite clips below. Paste a video URL or local file link,
+          then tap Play when you are ready.
+        </p>
+        <div class="video-grid">
+          <div class="video-card" data-video="1">
+            <video controls poster="">
+              <source src="videos/11.mp4" type="video/mp4" />
+            </video>
+            <input type="url" placeholder="videos/11.mp4" />
+            <button type="button">Load Video</button>
+          </div>
+          <div class="video-card" data-video="2">
+            <video controls poster="">
+              <source src="videos/22.mp4" type="video/mp4" />
+            </video>
+            <input type="url" placeholder="videos/22.mp4" />
+            <button type="button">Load Video</button>
+          </div>
+          <div class="video-card" data-video="3">
+            <video controls poster="">
+              <source src="videos/33.mp4" type="video/mp4" />
+            </video>
+            <input type="url" placeholder="videos/33.mp4" />
+            <button type="button">Load Video</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Our Photos</h2>
+        <p>
+          These are some of my favorite snapshots of you. 
+        </p>
+        <div class="photo-grid">
+          <figure>
+            <img src="images/1.jpeg" alt="Valentine memory 1" />
+            <figcaption>Memory 1</figcaption>
+          </figure>
+          <figure>
+            <img src="images/2.jpeg" alt="Valentine memory 2" />
+            <figcaption>Memory 2</figcaption>
+          </figure>
+          <figure>
+            <img src="images/3.jpeg" alt="Valentine memory 3" />
+            <figcaption>Memory 3</figcaption>
+          </figure>
+          <figure>
+            <img src="images/4.jpeg" alt="Valentine memory 4" />
+            <figcaption>Memory 4</figcaption>
+          </figure>
+          <figure>
+            <img src="images/5.jpeg" alt="Valentine memory 5" />
+            <figcaption>Memory 5</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <footer>
+        <div class="final-line">Thank you for being my heart home.</div>
+        <div>Open this whenever you need a reminder of us.</div>
+      </footer>
+    </main>
+
+    <script>
+      const handDrag = document.getElementById("handDrag");
+      const handTarget = document.getElementById("handTarget");
+      const puzzleArea = document.getElementById("puzzleArea");
+      const statusPill = document.getElementById("statusPill");
+      const veil = document.getElementById("veil");
+      const mainContent = document.getElementById("mainContent");
+
+      let isDragging = false;
+      let offsetX = 0;
+      let offsetY = 0;
+
+      const setStatus = (text, ready = false) => {
+        statusPill.textContent = text;
+        statusPill.classList.toggle("ready", ready);
+      };
+
+      const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+
+      const getCenter = (element) => {
+        const rect = element.getBoundingClientRect();
+        return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+      };
+
+      const checkUnlock = () => {
+        const dragCenter = getCenter(handDrag);
+        const targetCenter = getCenter(handTarget);
+        const distance = Math.hypot(dragCenter.x - targetCenter.x, dragCenter.y - targetCenter.y);
+        if (distance < 40) {
+          setStatus("Our hearts are now one", true);
+          veil.classList.add("hidden");
+          mainContent.classList.add("unlocked");
+          document.removeEventListener("mousemove", onDrag);
+          document.removeEventListener("mouseup", stopDrag);
+          document.removeEventListener("touchmove", onDrag);
+          document.removeEventListener("touchend", stopDrag);
+        }
+      };
+
+      const startDrag = (event) => {
+        const rect = handDrag.getBoundingClientRect();
+        const point = event.touches ? event.touches[0] : event;
+        offsetX = point.clientX - rect.left;
+        offsetY = point.clientY - rect.top;
+        isDragging = true;
+        handDrag.classList.add("dragging");
+        setStatus("Almost there... feel my presence");
+      };
+
+      const onDrag = (event) => {
+        if (!isDragging) return;
+        const point = event.touches ? event.touches[0] : event;
+        const areaRect = puzzleArea.getBoundingClientRect();
+        const newX = clamp(point.clientX - areaRect.left - offsetX, 0, areaRect.width - handDrag.offsetWidth);
+        const newY = clamp(point.clientY - areaRect.top - offsetY, 0, areaRect.height - handDrag.offsetHeight);
+        handDrag.style.left = `${newX}px`;
+        handDrag.style.top = `${newY}px`;
+        checkUnlock();
+      };
+
+      const stopDrag = () => {
+        if (!isDragging) return;
+        isDragging = false;
+        handDrag.classList.remove("dragging");
+        setStatus("Let my hand find yours");
+      };
+
+      handDrag.addEventListener("mousedown", startDrag);
+      handDrag.addEventListener("touchstart", startDrag, { passive: true });
+      document.addEventListener("mousemove", onDrag);
+      document.addEventListener("touchmove", onDrag, { passive: true });
+      document.addEventListener("mouseup", stopDrag);
+      document.addEventListener("touchend", stopDrag);
+
+      document.querySelectorAll(".video-card").forEach((card) => {
+        const button = card.querySelector("button");
+        const input = card.querySelector("input");
+        const video = card.querySelector("video");
+        const source = card.querySelector("source");
+        button.addEventListener("click", () => {
+          if (!input.value) return;
+          source.src = input.value;
+          video.load();
+        });
+      });
+    </script>
+  </body>
+</html>
